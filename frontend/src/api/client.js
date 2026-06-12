@@ -1,11 +1,13 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5001",
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-// Le token admin (s'il existe) est attaché à chaque requête.
-// Les routes publiques ignorent simplement ce header.
+// Intercepteur pour ajouter le token admin
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("adminToken");
   if (token) {
@@ -13,5 +15,20 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// Intercepteur pour gérer les erreurs
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response) {
+      console.error('API Error:', error.response.status, error.response.data);
+    } else if (error.request) {
+      console.error('API Network Error:', error.request);
+    } else {
+      console.error('API Error:', error.message);
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default api;

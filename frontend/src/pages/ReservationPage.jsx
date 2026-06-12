@@ -46,8 +46,10 @@ export default function ReservationPage() {
         setDisponibilites(res.data.disponibilites);
         setPrixParHeure(res.data.prixParHeure);
         setCreneauxSelectionnes([]);
-      } catch {
-        setErreur("Impossible de charger les disponibilités.");
+      } catch (err) {
+        console.error("Erreur chargement disponibilités:", err);
+        setErreur("Impossible de charger les disponibilités. Vérifiez la connexion au serveur.");
+        setDisponibilites([]);
         setCreneauxSelectionnes([]);
       }
     };
