@@ -14,7 +14,7 @@ router.get("/", async (req, res) => {
     }
     res.json(terrain);
   } catch (err) {
-    res.status(500).json({ message: "Erreur serveur", error: err.message });
+    res.status(500).json({ message: "Erreur serveur" });
   }
 });
 
@@ -67,14 +67,32 @@ router.get("/disponibilites", async (req, res) => {
 
     res.json({ date, prixParHeure: terrain.prixParHeure, disponibilites });
   } catch (err) {
-    res.status(500).json({ message: "Erreur serveur", error: err.message });
+    res.status(500).json({ message: "Erreur serveur" });
   }
 });
 
 // PUT /terrain - mise à jour des infos du terrain (admin)
 router.put("/", verifyAdmin, async (req, res) => {
   try {
-    const updates = req.body;
+    // Whitelist explicite des champs modifiables — évite le mass assignment
+    const {
+      nom, adresse, description, telephone,
+      prixParHeure, heureOuverture, heureFermeture,
+      typeSurface, eclairage, vestiaires, photos,
+    } = req.body;
+    const updates = {
+      ...(nom !== undefined && { nom }),
+      ...(adresse !== undefined && { adresse }),
+      ...(description !== undefined && { description }),
+      ...(telephone !== undefined && { telephone }),
+      ...(prixParHeure !== undefined && { prixParHeure }),
+      ...(heureOuverture !== undefined && { heureOuverture }),
+      ...(heureFermeture !== undefined && { heureFermeture }),
+      ...(typeSurface !== undefined && { typeSurface }),
+      ...(eclairage !== undefined && { eclairage }),
+      ...(vestiaires !== undefined && { vestiaires }),
+      ...(photos !== undefined && { photos }),
+    };
     let terrain = await Terrain.findOne();
     if (!terrain) {
       terrain = new Terrain(updates);
@@ -84,7 +102,7 @@ router.put("/", verifyAdmin, async (req, res) => {
     await terrain.save();
     res.json(terrain);
   } catch (err) {
-    res.status(400).json({ message: "Erreur de mise à jour", error: err.message });
+    res.status(400).json({ message: "Erreur de mise à jour" });
   }
 });
 
@@ -94,6 +112,12 @@ router.post("/bloquer", verifyAdmin, async (req, res) => {
     const { date, heure } = req.body;
     if (!date || heure === undefined) {
       return res.status(400).json({ message: "date et heure sont requis" });
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return res.status(400).json({ message: "Format de date invalide (YYYY-MM-DD)" });
+    }
+    if (!Number.isInteger(heure) || heure < 0 || heure > 23) {
+      return res.status(400).json({ message: "Heure invalide (entier entre 0 et 23)" });
     }
     const terrain = await Terrain.findOne();
     if (!terrain) return res.status(404).json({ message: "Aucun terrain configuré" });
@@ -107,7 +131,7 @@ router.post("/bloquer", verifyAdmin, async (req, res) => {
     }
     res.json(terrain);
   } catch (err) {
-    res.status(400).json({ message: "Erreur", error: err.message });
+    res.status(400).json({ message: "Erreur" });
   }
 });
 
@@ -124,7 +148,7 @@ router.post("/debloquer", verifyAdmin, async (req, res) => {
     await terrain.save();
     res.json(terrain);
   } catch (err) {
-    res.status(400).json({ message: "Erreur", error: err.message });
+    res.status(400).json({ message: "Erreur" });
   }
 });
 

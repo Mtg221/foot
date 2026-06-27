@@ -66,7 +66,7 @@ router.get("/stats", verifyAdmin, async (req, res) => {
       revenusEncaisses,
     });
   } catch (err) {
-    res.status(500).json({ message: "Erreur serveur", error: err.message });
+    res.status(500).json({ message: "Erreur serveur" });
   }
 });
 

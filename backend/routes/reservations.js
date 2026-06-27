@@ -92,7 +92,7 @@ router.post("/", async (req, res) => {
     if (err.message.startsWith("INDISPONIBLE")) {
       return res.status(409).json({ message: err.message.replace("INDISPONIBLE: ", "") });
     }
-    res.status(500).json({ message: "Erreur serveur", error: err.message });
+    res.status(500).json({ message: "Erreur serveur" });
   } finally {
     session.endSession();
   }
@@ -120,7 +120,7 @@ router.get("/", verifyAdmin, async (req, res) => {
     const reservations = await Reservation.find(filtre).sort({ date: -1, createdAt: -1 });
     res.json(reservations);
   } catch (err) {
-    res.status(500).json({ message: "Erreur serveur", error: err.message });
+    res.status(500).json({ message: "Erreur serveur" });
   }
 });
 
@@ -139,7 +139,7 @@ router.patch("/:id/statut", verifyAdmin, async (req, res) => {
     if (!reservation) return res.status(404).json({ message: "Réservation non trouvée" });
     res.json(reservation);
   } catch (err) {
-    res.status(400).json({ message: "Erreur", error: err.message });
+    res.status(400).json({ message: "Erreur" });
   }
 });
 
@@ -157,7 +157,7 @@ router.patch("/:id/paiement", verifyAdmin, async (req, res) => {
     if (!reservation) return res.status(404).json({ message: "Réservation non trouvée" });
     res.json(reservation);
   } catch (err) {
-    res.status(400).json({ message: "Erreur", error: err.message });
+    res.status(400).json({ message: "Erreur" });
   }
 });
 
