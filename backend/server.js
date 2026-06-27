@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import helmet from "helmet";
 import dotenv from "dotenv";
 
 import terrainRoutes from "./routes/terrain.js";
@@ -12,8 +13,23 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
-app.use(express.json());
+app.use(helmet());
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  process.env.CORS_ORIGIN,
+].filter(Boolean);
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error("CORS non autorisé"));
+  },
+  credentials: true,
+}));
+
+app.use(express.json({ limit: "1mb" }));
 
 app.use("/terrain", terrainRoutes);
 app.use("/reservations", reservationRoutes);

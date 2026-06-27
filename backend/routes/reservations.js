@@ -21,6 +21,23 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ message: "Champs requis manquants" });
     }
 
+    if (typeof nomClient !== "string" || nomClient.trim().length < 2 || nomClient.length > 100) {
+      return res.status(400).json({ message: "Nom client invalide" });
+    }
+    if (typeof telephoneClient !== "string" || !/^\+?[\d\s\-()]{7,20}$/.test(telephoneClient)) {
+      return res.status(400).json({ message: "Numéro de téléphone invalide" });
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return res.status(400).json({ message: "Format de date invalide (YYYY-MM-DD)" });
+    }
+    if (creneaux.length > 15) {
+      return res.status(400).json({ message: "Trop de créneaux demandés" });
+    }
+    const creneauxValides = creneaux.every((h) => Number.isInteger(h) && h >= 0 && h <= 23);
+    if (!creneauxValides) {
+      return res.status(400).json({ message: "Créneaux invalides" });
+    }
+
     const terrain = await Terrain.findOne();
     if (!terrain) return res.status(404).json({ message: "Aucun terrain configuré" });
 

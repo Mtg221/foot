@@ -1,14 +1,28 @@
 import express from "express";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import rateLimit from "express-rate-limit";
 import Reservation from "../models/Reservation.js";
 import { verifyAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// POST /admin/login - authentification simple par mot de passe unique
-router.post("/login", (req, res) => {
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { message: "Trop de tentatives, réessayez dans 15 minutes" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// POST /admin/login - authentification par mot de passe hashé
+router.post("/login", loginLimiter, async (req, res) => {
   const { password } = req.body;
-  if (!password || password !== process.env.ADMIN_PASSWORD) {
+  if (!password) {
+    return res.status(401).json({ message: "Mot de passe incorrect" });
+  }
+  const isMatch = await bcrypt.compare(password, process.env.ADMIN_PASSWORD_HASH);
+  if (!isMatch) {
     return res.status(401).json({ message: "Mot de passe incorrect" });
   }
   const token = jwt.sign({ role: "admin" }, process.env.JWT_SECRET, { expiresIn: "12h" });
