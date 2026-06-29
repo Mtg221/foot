@@ -18,6 +18,7 @@ app.use(helmet());
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
+  "https://foot-vert.vercel.app",
   process.env.CORS_ORIGIN,
 ].filter(Boolean);
 
