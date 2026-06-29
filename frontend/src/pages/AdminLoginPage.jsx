@@ -17,33 +17,37 @@ export default function AdminLoginPage() {
       localStorage.setItem("adminToken", res.data.token);
       navigate("/admin");
     } catch {
-      setErreur("Mot de passe incorrect.");
+      setErreur("Mot de passe incorrect. Réessayez.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main>
-      <div className="card">
-        <h2>Connexion propriétaire</h2>
-        {erreur && <div className="error-msg">{erreur}</div>}
+    <div className="login-wrapper">
+      <div className="login-card">
+        <div className="login-icon">🔐</div>
+        <h2>Espace propriétaire</h2>
+        <p>Connectez-vous pour gérer les réservations et le terrain.</p>
+        {erreur && <div className="error-msg">⚠️ {erreur}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Mot de passe</label>
+            <label className="form-label">Mot de passe</label>
             <input
               type="password"
+              className="form-input"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
               required
               autoFocus
             />
           </div>
-          <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? "Connexion..." : "Se connecter"}
+          <button type="submit" className="btn btn-primary" disabled={loading} style={{marginTop:"8px"}}>
+            {loading ? "Connexion..." : "→ Se connecter"}
           </button>
         </form>
       </div>
-    </main>
+    </div>
   );
 }
