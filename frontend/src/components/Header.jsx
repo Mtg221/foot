@@ -1,7 +1,8 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 export default function Header() {
   const navigate = useNavigate();
+  const location = useLocation();
   const isAdmin = !!localStorage.getItem("adminToken");
 
   const handleLogout = () => {
@@ -10,19 +11,24 @@ export default function Header() {
   };
 
   return (
-    <header className="app-header">
-      <h1>⚽ Terrain Foot Cite Doudou Basse</h1>
-      <nav>
-        <Link to="/">Réserver</Link>
+    <nav className="navbar">
+      <Link to="/" className="navbar-brand">
+        <div className="logo-icon">⚽</div>
+        <span>Terrain Dakar</span>
+      </Link>
+      <div className="navbar-actions">
+        <Link to="/" className="nav-link" style={location.pathname === "/" ? {color:"#fff"} : {}}>
+          Réserver
+        </Link>
         {isAdmin ? (
           <>
-            <Link to="/admin">Admin</Link>
-            <button onClick={handleLogout}>Déconnexion</button>
+            <Link to="/admin" className="nav-link">Dashboard</Link>
+            <button className="nav-btn" onClick={handleLogout}>Déconnexion</button>
           </>
         ) : (
-          <Link to="/admin/login">Admin</Link>
+          <Link to="/admin/login" className="nav-btn nav-btn-primary">Admin</Link>
         )}
-      </nav>
-    </header>
+      </div>
+    </nav>
   );
 }
